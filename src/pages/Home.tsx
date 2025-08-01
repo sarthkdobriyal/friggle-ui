@@ -7,6 +7,7 @@ import HeaderForHomepage from '../components/layout/HeaderForHomepage';
 const Home: React.FC = () => {
 
 
+
   return (
      <div className="min-h-screen ">
       {/* Hero Section */}

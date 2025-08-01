@@ -118,10 +118,10 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-gray-400" />
                     <Select defaultValue="5">
-                      <SelectTrigger className="w-24 bg-white/5 border-white/10 text-white text-sm">
+                      <SelectTrigger className=" bg-white/5 border-white/10 text-white text-sm">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className=" bg-white/5 backdrop-blur-md border-white/10 text-white text-sm">
                         <SelectItem value="5">5 seconds</SelectItem>
                         <SelectItem value="10">10 seconds</SelectItem>
                         <SelectItem value="15">15 seconds</SelectItem>
@@ -131,10 +131,10 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   <div className="flex items-center space-x-2">
                     <Film className="h-4 w-4 text-gray-400" />
                     <Select defaultValue="720p">
-                      <SelectTrigger className="w-32 bg-white/5 border-white/10 text-white text-sm">
+                      <SelectTrigger className=" bg-white/5 border-white/10 text-white text-sm">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className=" bg-white/5 backdrop-blur-md border-white/10 text-white text-sm">
                         <SelectItem value="720p">HD (720p)</SelectItem>
                         <SelectItem value="1080p">Full HD (1080p)</SelectItem>
                       </SelectContent>
