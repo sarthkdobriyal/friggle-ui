@@ -5,6 +5,8 @@ import hero from '../assets/videos/hero.mp4'
 import HeaderForHomepage from '../components/layout/HeaderForHomepage';
 
 const Home: React.FC = () => {
+
+
   return (
      <div className="min-h-screen ">
       {/* Hero Section */}
@@ -12,19 +14,19 @@ const Home: React.FC = () => {
         <video src={hero} className="absolute inset-0 w-full h-full object-cover opacity-70" autoPlay loop muted  />
        <HeaderForHomepage />
         
-        <div className="relative z-10 max-w-7xl mt-32 md:mt-60 ml-4 md:ml-12  text-left">
+        <div className="relative z-10  md:max-w-7xl mt-60 ml-4 md:ml-12  text-left">
           <div className="flex justify-start mb-8">
             <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full p-4 backdrop-blur-sm border border-white/10">
               <Play className="h-16 w-16 text-purple-400" />
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-4xl md:text-7xl font-bold text-white mb-6 leading-tight flex-col flex">
             Create Stunning
             <span className="bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"> AI Videos</span>
           </h1>
           
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl  leading-relaxed">
+          <p className="text-base md:text-xl text-gray-300 mb-8 max-w-3xl w-[80%]  leading-relaxed">
             Transform your ideas into captivating videos with our cutting-edge AI technology. 
             No experience needed – just describe your vision and watch it come to life.
           </p>
