@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   return (
      <div className="min-h-screen ">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pb-20  h-screen">
+      <section className="relative overflow-hidden pb-20  h-full">
         <video src={hero} className="absolute inset-0 w-full h-full object-cover opacity-70" autoPlay loop muted  />
        <HeaderForHomepage />
         
