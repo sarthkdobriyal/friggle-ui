@@ -15,7 +15,7 @@ const Home: React.FC = () => {
         <video src={hero} className="absolute inset-0 w-full h-full object-cover opacity-70" autoPlay loop muted  />
        <HeaderForHomepage />
         
-        <div className="relative z-10  md:max-w-7xl mt-60 ml-4 md:ml-12  text-left">
+        <div className="relative z-10  md:max-w-7xl mt-18 sm:mt-32  md:mt-44 ml-4 md:ml-12  text-left">
           <div className="flex justify-start mb-8">
             <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full p-4 backdrop-blur-sm border border-white/10">
               <Play className="h-16 w-16 text-purple-400" />
