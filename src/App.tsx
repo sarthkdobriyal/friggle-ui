@@ -19,6 +19,7 @@ import Payment from './pages/dashboard/Payment';
 import './App.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 
 
 
@@ -98,6 +99,10 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+    <Toaster 
+      position="top-right"
+      richColors
+    />
     <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
