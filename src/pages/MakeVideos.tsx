@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Play, Settings, Download, Share2, Sparkles, Clock, Film } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 interface MakeVideosPageProps {
   isDashboard?: boolean;
@@ -110,18 +117,28 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-gray-400" />
-                    <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm">
-                      <option>5 seconds</option>
-                      <option>10 seconds</option>
-                      <option>15 seconds</option>
-                    </select>
+                    <Select defaultValue="5">
+                      <SelectTrigger className="w-24 bg-white/5 border-white/10 text-white text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">5 seconds</SelectItem>
+                        <SelectItem value="10">10 seconds</SelectItem>
+                        <SelectItem value="15">15 seconds</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Film className="h-4 w-4 text-gray-400" />
-                    <select className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm">
-                      <option>HD (720p)</option>
-                      <option>Full HD (1080p)</option>
-                    </select>
+                    <Select defaultValue="720p">
+                      <SelectTrigger className="w-32 bg-white/5 border-white/10 text-white text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="720p">HD (720p)</SelectItem>
+                        <SelectItem value="1080p">Full HD (1080p)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 
