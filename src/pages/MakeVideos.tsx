@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useMutation } from '@tanstack/react-query';
 import { Play, Settings, Download, Share2, Sparkles, Clock, Film } from 'lucide-react';
 import {
   Select,
@@ -8,6 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import { videoApi } from '@/services/videoApi';
+import { toast } from 'sonner';
 
 interface MakeVideosPageProps {
   isDashboard?: boolean;
@@ -16,17 +19,24 @@ interface MakeVideosPageProps {
 const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
   const { isAuthenticated } = useAuth();
   const [prompt, setPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
+
+  const generateVideoMutation = useMutation({
+    mutationFn: (prompt: string) => videoApi.generateVideo(prompt),
+    onSuccess: (data) => {
+      toast.success('Video generated successfully!');
+      setGeneratedVideo(data.videoUrl || 'generated-video-url');
+    },
+    onError: (error) => {
+      console.error('Video generation failed:', error);
+      // Handle error appropriately
+      toast(error.message || 'Video generation failed');
+    }
+  });
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    
-    setIsGenerating(true);
-    // Simulate video generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    setGeneratedVideo('generated-video-url');
-    setIsGenerating(false);
+    generateVideoMutation.mutate(prompt);
   };
 
   if (!isDashboard && !isAuthenticated) {
@@ -97,7 +107,44 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Generation Panel */}
           <div className="lg:col-span-2">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6">
+
+
+           {/* Generated Video Display */}
+            {(generatedVideo || generateVideoMutation.isPending) && (
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                <h3 className="text-lg font-semibold text-white mb-4">Generated Video</h3>
+                
+                <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center">
+                  {generateVideoMutation.isPending ? (
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+                      <p className="text-gray-300">Generating your video...</p>
+                    </div>
+                  ) : (
+                    <Play className="h-16 w-16 text-purple-400" />
+                  )}
+                </div>
+
+                {generatedVideo && (
+                  <div className="flex items-center space-x-4">
+                    <button className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                      <Download className="h-4 w-4" />
+                      <span>Download</span>
+                    </button>
+                    <button className="flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
+                      <Share2 className="h-4 w-4" />
+                      <span>Share</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+
+
+
+
+            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 mb-6 mt-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
                 <Sparkles className="h-5 w-5 text-purple-400" />
                 <span>Video Prompt</span>
@@ -149,10 +196,10 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
               <button
                 onClick={handleGenerate}
-                disabled={!prompt.trim() || isGenerating}
+                disabled={!prompt.trim() || generateVideoMutation.isPending}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                {isGenerating ? (
+                {generateVideoMutation.isPending ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                     <span>Generating...</span>
@@ -166,41 +213,12 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               </button>
             </div>
 
-            {/* Generated Video Display */}
-            {(generatedVideo || isGenerating) && (
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-4">Generated Video</h3>
-                
-                <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center">
-                  {isGenerating ? (
-                    <div className="text-center">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-                      <p className="text-gray-300">Generating your video...</p>
-                    </div>
-                  ) : (
-                    <Play className="h-16 w-16 text-purple-400" />
-                  )}
-                </div>
-
-                {generatedVideo && (
-                  <div className="flex items-center space-x-4">
-                    <button className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                      <Download className="h-4 w-4" />
-                      <span>Download</span>
-                    </button>
-                    <button className="flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                      <Share2 className="h-4 w-4" />
-                      <span>Share</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+           
           </div>
 
           {/* Recent Videos Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+            <div className=" backdrop-blur-lg rounded-2xl p-6 ">
               <h3 className="text-lg font-semibold text-white mb-4">Recent Videos</h3>
               
               <div className="space-y-4">

@@ -1,13 +1,8 @@
 
-import { useAuth } from '@/context/AuthContext';
 import React from 'react';
 
 const Dashboard: React.FC = () => {
 
-  
-  const { user } = useAuth();
-
-  console.log("User in dashboard:", user);
 
   return (
     <div className="min-h-screen">
