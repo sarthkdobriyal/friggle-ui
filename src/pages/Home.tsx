@@ -12,7 +12,7 @@ const Home: React.FC = () => {
         <video src={hero} className="absolute inset-0 w-full h-full object-cover opacity-70" autoPlay loop muted  />
        <HeaderForHomepage />
         
-        <div className="relative z-10 max-w-7xl mt-60 ml-12 text-left">
+        <div className="relative z-10 max-w-7xl mt-32 md:mt-60 ml-4 md:ml-12  text-left">
           <div className="flex justify-start mb-8">
             <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-full p-4 backdrop-blur-sm border border-white/10">
               <Play className="h-16 w-16 text-purple-400" />
@@ -29,7 +29,7 @@ const Home: React.FC = () => {
             No experience needed – just describe your vision and watch it come to life.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-start items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-start items-start">
             <Link
               to="/register"
               className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 flex items-center space-x-2"
