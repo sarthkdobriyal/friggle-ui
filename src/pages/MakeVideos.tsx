@@ -288,6 +288,9 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
           <div className="lg:col-span-1">
             <div className=" backdrop-blur-lg rounded-2xl p-6 ">
               <h3 className="text-lg font-semibold text-white mb-4">Recent Videos</h3>
+              <p className="text-yellow-400 text-xs mb-4 p-2 bg-yellow-400/10 rounded border border-yellow-400/20">
+                ⚠️ Videos will be automatically removed in 2 days
+              </p>
               
               <div className="space-y-4">
                 {isLoadingRecent ? (

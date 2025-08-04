@@ -39,6 +39,9 @@ const Dashboard: React.FC = () => {
         {/* Recent Videos */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-white mb-4">Recent Videos</h2>
+          <p className="text-yellow-400 w-fit text-sm mb-4 p-3 bg-yellow-400/10 rounded-lg border border-yellow-400/20">
+            ⚠️ Videos will be automatically removed in 2 days
+          </p>
           <div className=" ">
             <div className="p-4">
               {isLoadingRecent ? (
