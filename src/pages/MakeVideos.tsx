@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, {  useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Play, Settings, Download, Share2, Sparkles, Clock, Film } from 'lucide-react';
 import {
   Select,
@@ -11,6 +11,7 @@ import {
 } from "../components/ui/select";
 import { videoApi } from '@/services/videoApi';
 import { toast } from 'sonner';
+import type { Video } from '@/types';
 
 interface MakeVideosPageProps {
   isDashboard?: boolean;
@@ -25,6 +26,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
     mutationFn: (prompt: string) => videoApi.generateVideo(prompt),
     onSuccess: (data) => {
       toast.success('Video generated successfully!');
+      console.log('Generated video data:', data);
       setGeneratedVideo(data.videoUrl || 'generated-video-url');
     },
     onError: (error) => {
@@ -34,10 +36,60 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
     }
   });
 
+  const { data: recentVideos, isLoading: isLoadingRecent, error: recentError } = useQuery({
+    queryKey: ['recentVideos'],
+    queryFn: () => videoApi.getRecentVideos(),
+    enabled: isAuthenticated && isDashboard,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+  });
+
+
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
     generateVideoMutation.mutate(prompt);
   };
+
+  const handleDownload = () => {
+    if (!generatedVideo || generatedVideo === 'generated-video-url') return;
+    
+    const link = document.createElement('a');
+    link.href = generatedVideo;
+    link.download = `generated-video-${Date.now()}.mp4`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleShare = async () => {
+    if (!generatedVideo || generatedVideo === 'generated-video-url') return;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Check out my AI-generated video!',
+          text: `Generated with prompt: "${prompt}"`,
+          url: generatedVideo,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+        // Fallback to copying URL
+        await navigator.clipboard.writeText(generatedVideo);
+        toast.success('Video URL copied to clipboard!');
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      try {
+        await navigator.clipboard.writeText(generatedVideo);
+        toast.success('Video URL copied to clipboard!');
+      } catch (error) {
+        console.error('Error copying to clipboard:', error);
+        toast.error('Failed to copy video URL');
+      }
+    }
+  };
+
+  console.log('Recent videos:', recentVideos);
 
   if (!isDashboard && !isAuthenticated) {
     // Preview mode for non-authenticated users
@@ -114,12 +166,22 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
                 <h3 className="text-lg font-semibold text-white mb-4">Generated Video</h3>
                 
-                <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center">
+                <div className="aspect-video bg-gradient-to-br from-purple-900/50 to-blue-900/50 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
                   {generateVideoMutation.isPending ? (
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
                       <p className="text-gray-300">Generating your video...</p>
                     </div>
+                  ) : generatedVideo && generatedVideo !== 'generated-video-url' ? (
+                    <video
+                      src={generatedVideo}
+                      className="w-full h-full object-cover rounded-lg"
+                      controls
+                      autoPlay
+                      muted
+                    >
+                      Your browser does not support the video tag.
+                    </video>
                   ) : (
                     <Play className="h-16 w-16 text-purple-400" />
                   )}
@@ -127,11 +189,17 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
                 {generatedVideo && (
                   <div className="flex items-center space-x-4">
-                    <button className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    <button 
+                      onClick={handleDownload}
+                      className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    >
                       <Download className="h-4 w-4" />
                       <span>Download</span>
                     </button>
-                    <button className="flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
+                    <button 
+                      onClick={handleShare}
+                      className="flex items-center space-x-2 bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors"
+                    >
                       <Share2 className="h-4 w-4" />
                       <span>Share</span>
                     </button>
@@ -222,15 +290,51 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               <h3 className="text-lg font-semibold text-white mb-4">Recent Videos</h3>
               
               <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-pointer">
-                    <div className="aspect-video bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded mb-2 flex items-center justify-center">
-                      <Play className="h-6 w-6 text-purple-400" />
-                    </div>
-                    <p className="text-white text-sm font-medium mb-1">Video {i}</p>
-                    <p className="text-gray-400 text-xs">2 hours ago</p>
+                {isLoadingRecent ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400 mx-auto mb-2"></div>
+                    <p className="text-gray-400 text-sm">Loading videos...</p>
                   </div>
-                ))}
+                ) : recentError ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">Failed to load recent videos</p>
+                  </div>
+                ) : recentVideos && recentVideos.length > 0 ? (
+                  recentVideos.slice(0, 5).map((video : Video) => ( 
+                    <div key={video.id} className="bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-pointer">
+                      <div className="aspect-video bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded mb-2 relative overflow-hidden">
+                        {video.video_url ? (
+                          <video
+                            src={video.video_url}
+                            className="w-full h-full object-contain rounded"
+                            controls
+                            preload="metadata"
+                            poster={video.thumbnailUrl}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : video.thumbnailUrl ? (
+                          <img src={video.thumbnailUrl} alt={video.title} className="w-full h-full object-cover rounded" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Play className="h-6 w-6 text-purple-400" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white text-sm font-medium mb-1 truncate" title={video.title || video.prompt}>
+                        {video.title || video.prompt?.substring(0, 30) + '...' || 'Untitled Video'}
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        {video.createdAt ? new Date(video.createdAt).toLocaleDateString() : 'Recently created'}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">No recent videos</p>
+                    <p className="text-gray-500 text-xs mt-1">Generate your first video to see it here</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -241,3 +345,5 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 };
 
 export default MakeVideos;
+
+
