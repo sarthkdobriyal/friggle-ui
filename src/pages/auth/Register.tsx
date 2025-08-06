@@ -8,6 +8,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   const { register, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -15,18 +16,35 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
     
+    // Split name into firstName and lastName
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
     try {
-      await register(name, email, password);
+      // Update the register call to match the expected parameters
+      await register(name, email, password, firstName, lastName);
       navigate('/dashboard');
-    } catch (err) {
-        console.error(err);
-      setError('Registration failed. Please try again.');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      
+      // Handle validation errors from the backend response
+      if (err.response?.data?.errors) {
+        setFieldErrors(err.response.data.errors);
+        setError('Please fix the errors below');
+      } else if (err.errors) {
+        setFieldErrors(err.errors);
+        setError('Please fix the errors below');
+      } else {
+        setError(err.response?.data?.message || err.message || 'Registration failed');
+      }
     }
   };
 
@@ -66,9 +84,16 @@ const Register: React.FC = () => {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                 className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Enter your full name"
+                className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  fieldErrors.firstName || fieldErrors.lastName ? 'border-red-500' : 'border-white/10'
+                }`}
+                placeholder="Enter your full name (first and last)"
               />
+              {(fieldErrors.firstName || fieldErrors.lastName) && (
+                <p className="mt-1 text-sm text-red-400">
+                  {fieldErrors.firstName || fieldErrors.lastName}
+                </p>
+              )}
             </div>
             
             <div>
@@ -83,9 +108,16 @@ const Register: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                 className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  fieldErrors.email ? 'border-red-500' : 'border-white/10'
+                }`}
                 placeholder="Enter your email"
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-sm text-red-400">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             
             <div>
@@ -100,9 +132,16 @@ const Register: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                 className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                placeholder="Enter your password"
+                className={`w-full pl-10 pr-4 py-3 bg-white/5 border rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  fieldErrors.password ? 'border-red-500' : 'border-white/10'
+                }`}
+                placeholder="Enter your password (min 6 characters)"
               />
+              {fieldErrors.password && (
+                <p className="mt-1 text-sm text-red-400">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
             
             <div>
