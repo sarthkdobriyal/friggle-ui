@@ -25,7 +25,7 @@ function Header({ onMenuToggle }: HeaderProps) {
           <div className="flex-col ml-2 md:ml-8">
 
           
-           <Link to="/admin" className="flex items-center space-x-2">
+           <Link to="/dashboard" className="flex items-center space-x-2">
             <Video className="h-4 w-4 md:h-8 md:w-8 text-purple-400" />
             <span className="text-base md:text-2xl font-bold text-gray-900">Friggle.ai</span>
           </Link>
