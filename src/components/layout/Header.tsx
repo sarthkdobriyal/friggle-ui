@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Video, Menu, X } from 'lucide-react';
 
@@ -10,6 +10,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const handleLogout = () => {
@@ -21,6 +22,8 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const isActiveLink = (path: string) => location.pathname === path;
 
   return (
     <header className={`bg-black/10 backdrop-blur-lg `}>
@@ -34,20 +37,36 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex  items-center space-x-4">
               {!isAuthenticated  ? (
                 // Public navigation
                 <>
-                  <Link to="/" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Home
                   </Link>
-                  <Link to="/make-videos" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/make-videos" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/make-videos') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Make Videos
                   </Link>
-                  <Link to="/about" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/about" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/about') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     About Us
                   </Link>
-                  <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/login" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/login') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Login
                   </Link>
                   <Link to={ isAuthenticated ?  "/dashboard" : "/register"} className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105">
@@ -57,23 +76,42 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
               ) : (
                 // Authenticated navigation
                 <>
-                  <Link to="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/dashboard" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/dashboard') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Dashboard
                   </Link>
-                  <Link to="/generate-videos" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/generate-videos" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/generate-videos') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Make Videos
                   </Link>
-                  <Link to="/credits" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/credits" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/credits') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Credits
                   </Link>
-                  <Link to="/payment" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                  <Link to="/payment" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/payment') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
                     Payment
                   </Link>
                   
                   {/* User menu */}
-                  <div className="flex items-center space-x-4 ml-6">
+                  <div className="flex items-center space-x-4 ml-6 ">
                     <span className="text-sm text-gray-50">
-                      Welcome, {user?.name}
+                      Welcome,
+                      <span className='block justify-self-end'>
+                       {user?.name}
+                      </span>
                     </span>
                     <button
                       onClick={handleLogout}
@@ -111,28 +149,44 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
                 <>
                   <Link 
                     to="/" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Home
                   </Link>
                   <Link 
                     to="/make-videos" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/make-videos') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Make Videos
                   </Link>
                   <Link 
                     to="/about" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/about') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     About Us
                   </Link>
                   <Link 
                     to="/login" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/login') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Login
@@ -153,28 +207,44 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
                   </div>
                   <Link 
                     to="/dashboard" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/dashboard') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link 
                     to="/generate-videos" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/generate-videos') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Make Videos
                   </Link>
                   <Link 
                     to="/credits" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/credits') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Credits
                   </Link>
                   <Link 
                     to="/payment" 
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+                    className={`block px-3 py-2 rounded-md font-medium transition-colors ${
+                      isActiveLink('/payment') 
+                        ? 'text-white text-lg' 
+                        : 'text-gray-300 hover:text-white text-base'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Payment
