@@ -1,14 +1,14 @@
 import React, {  useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Play, Settings, Download, Share2, Sparkles, Clock, Film } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
+import { Play,  Download, Share2, Sparkles } from 'lucide-react';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "../components/ui/select";
 import { videoApi } from '@/services/videoApi';
 import { toast } from 'sonner';
 import type { Video } from '@/types';
