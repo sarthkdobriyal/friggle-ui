@@ -13,5 +13,9 @@ export const videoApi = {
   getAllVideos: async () => {
     const response = await authClient.get('/video/all');
     return response.data;
+  },
+  enhancePrompt: async (userInput: string) => {
+    const response = await authClient.post('/video/enhancePrompt', { userInput });
+    return response.data;
   }
 };
