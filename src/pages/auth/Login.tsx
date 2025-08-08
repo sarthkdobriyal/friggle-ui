@@ -20,9 +20,11 @@ const Login: React.FC = () => {
     try {
       await login(email, password);
       navigate(from, { replace: true });
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err : any) {
         console.error(err);
-      setError('Login failed. Please try again.');
+
+      setError(err.message || 'Login failed. Please try again.');
     }
   };
 
