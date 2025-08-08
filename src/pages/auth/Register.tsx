@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -23,18 +24,26 @@ const Register: React.FC = () => {
       return;
     }
     
-    // Split name into firstName and lastName
-    const nameParts = name.trim().split(' ');
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
+    if (name.trim().split(' ').length < 2) {
+      setFieldErrors({
+        firstName: 'First name and last Name is required',
+        lastName: 'Last name is required'
+      });
+      return;
+    }
+
+    if(password.length < 6) {
+      setFieldErrors(prev => ({ ...prev, password: 'Password must be at least 6 characters' }));
+      return;
+    }
     
     try {
       // Update the register call to match the expected parameters
-      await register(name, email, password, firstName, lastName);
+      await register(name, email, password);
       navigate('/dashboard');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      console.error('Registration error:', err);
-      
+      toast.error('Registration failed. Please try again.');
       // Handle validation errors from the backend response
       if (err.response?.data?.errors) {
         setFieldErrors(err.response.data.errors);
