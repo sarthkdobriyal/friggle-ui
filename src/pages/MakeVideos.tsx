@@ -228,7 +228,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                 />
               </div>
 
-              <div className="flex items-center justify-between mb-6">
+              {/* <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-gray-400" />
@@ -260,7 +260,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                 <button className="text-gray-400 hover:text-white">
                   <Settings className="h-5 w-5" />
                 </button>
-              </div>
+              </div> */}
 
               <button
                 onClick={handleGenerate}
