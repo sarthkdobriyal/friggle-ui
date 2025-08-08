@@ -12,6 +12,8 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  console.log(user)
   
   const handleLogout = () => {
     logout();
@@ -83,6 +85,13 @@ const Header: React.FC<HeaderProps> = ({ isAuthenticated = false }) => {
                   }`}>
                     Dashboard
                   </Link>
+                 {user?.role === "admin" && <Link to="/admin" className={`px-3 py-2 rounded-md font-medium transition-colors ${
+                    isActiveLink('/admin') 
+                      ? 'text-white text-base' 
+                      : 'text-gray-300 hover:text-white text-sm'
+                  }`}>
+                    Admin Dashboard
+                  </Link>}
                   <Link to="/generate-videos" className={`px-3 py-2 rounded-md font-medium transition-colors ${
                     isActiveLink('/generate-videos') 
                       ? 'text-white text-base' 

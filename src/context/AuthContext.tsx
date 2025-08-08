@@ -8,11 +8,14 @@ interface User {
   name: string;
   email: string;
   credits: number;
+  role?: string; // Optional role field for future use
+  isActive?: boolean; // Optional field to check if user is active
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isAdmin?: boolean; // Optional field to check if user is admin
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -49,7 +52,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               id: response.data.user._id,
               name: `${response.data.user.firstName} ${response.data.user.lastName}`,
               email: response.data.user.email,
-              credits: response.data.user.credits || 0
+              credits: response.data.user.credits || 0,
+              role: response.data.user.role, // Default to 'user' role
             });
           }
         })
@@ -79,7 +83,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           id: userData._id,
           name: `${userData.firstName} ${userData.lastName}`,
           email: userData.email,
-          credits: userData.credits || 0
+          credits: userData.credits || 0,
+          role: userData.role, // Default to 'user' role
         };
         
         setUser(newUser);
@@ -117,7 +122,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           id: userData._id,
           name: `${userData.firstName} ${userData.lastName}`,
           email: userData.email,
-          credits: userData.credits || 50
+          credits: userData.credits || 50,
+          role: userData.role  // Default to 'user' role
         };
         
         setUser(newUser);
@@ -149,6 +155,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
+    isAdmin: !!user && user?.role === 'admin',
     isLoading,
     login,
     logout,
