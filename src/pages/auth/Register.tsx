@@ -42,6 +42,7 @@ const Register: React.FC = () => {
     try {
       // Update the register call to match the expected parameters
       await register(name, email, password);
+      toast.success('Registration successful! Redirecting to dashboard...');
       navigate('/dashboard');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -213,7 +214,7 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+               className="w-full cursor-pointer bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </button>
