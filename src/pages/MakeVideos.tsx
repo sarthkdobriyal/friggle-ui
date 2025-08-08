@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {  useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -29,10 +30,10 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
       console.log('Generated video data:', data);
       setGeneratedVideo(data.videoUrl || 'generated-video-url');
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Video generation failed:', error);
       // Handle error appropriately
-      toast(error.message || 'Video generation failed');
+      toast(error.response?.data?.error || 'Video generation failed');
     }
   });
 
