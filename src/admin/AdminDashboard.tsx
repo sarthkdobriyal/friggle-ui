@@ -5,11 +5,13 @@ import { useQuery } from '@tanstack/react-query'
 import { adminApi } from '@/services/adminApi'
 import Videos from './components/Videos'
 import Users from './components/Users'
+import type { User } from '@/types'
 
 
 function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState('dashboard')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const { data: stats } = useQuery({
     queryKey: ['admin-stats'],
@@ -20,12 +22,17 @@ function AdminDashboard() {
   console.log('Admin Dashboard Stats:', stats);
 
 
+  const handleSeeVideos = (user: User) => {
+    setSelectedUser(user);
+    setCurrentPage('videos');
+  };
+
   const renderContent = () => {
     switch (currentPage) {
       case 'users':
-        return <Users />
+        return <Users onSeeVideos={handleSeeVideos} />
       case 'videos':
-        return <Videos />
+        return <Videos selectedUser={selectedUser} />
       default:
         return (
           <div className="p-6">

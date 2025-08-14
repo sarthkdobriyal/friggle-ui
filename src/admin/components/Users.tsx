@@ -13,28 +13,27 @@ import { type SortingState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import type { User } from '@/types';
 
 
-interface User {
-  _id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
-}
+
 
 const columnHelper = createColumnHelper<User>();
 
-function Users() {
+interface UsersProps {
+  onSeeVideos?: (user: User) => void;
+}
+
+function Users({ onSeeVideos }: UsersProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const { data: users, isPending, error } = useQuery({
     queryKey: ['admin-users'],
@@ -74,6 +73,33 @@ function Users() {
       toast.error('Failed to update active status');
     }
   });
+
+  // Filter users based on search and filters
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    return users.filter((user: User) => {
+      // Search by name or email
+      const searchText = search.toLowerCase();
+      const matchesSearch =
+        user.firstName.toLowerCase().includes(searchText) ||
+        user.lastName.toLowerCase().includes(searchText) ||
+        user.email.toLowerCase().includes(searchText);
+
+      // Role filter
+      const matchesRole =
+        roleFilter === 'all' ? true : user.role === roleFilter;
+
+      // Status filter
+      const matchesStatus =
+        statusFilter === 'all'
+          ? true
+          : statusFilter === 'active'
+            ? user.isActive
+            : !user.isActive;
+
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, search, roleFilter, statusFilter]);
 
   const columns = useMemo(() => [
     columnHelper.accessor('firstName', {
@@ -122,23 +148,33 @@ function Users() {
     }),
     // Actions column
     columnHelper.display({
+      id: 'videos',
+      header: 'Videos',
+      cell: info => {
+        const user = info.row.original;
+        return (
+          <div className="flex gap-2">
+           <Button
+              variant="default"
+              className='bg-accent text-blue-500'
+              size="sm"
+              onClick={() => onSeeVideos?.(user)}
+            >
+              See Videos
+            </Button>
+          </div>
+        );
+      }
+    }),
+    // Actions column
+    columnHelper.display({
       id: 'actions',
       header: 'Actions',
       cell: info => {
         const user = info.row.original;
         return (
           <div className="flex gap-2">
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                setUserToDelete(user);
-                setConfirmOpen(true);
-              }}
-              disabled={deleteUserMutation.isPending}
-            >
-              Delete
-            </Button>
+           
             <Button
               variant="secondary"
               size="sm"
@@ -155,14 +191,25 @@ function Users() {
             >
               {user.isActive ? 'Deactivate' : 'Activate'}
             </Button>
+             <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                setUserToDelete(user);
+                setConfirmOpen(true);
+              }}
+              disabled={deleteUserMutation.isPending}
+            >
+              Delete
+            </Button>
           </div>
         );
       }
     }),
-  ], [deleteUserMutation, toggleAdminMutation, toggleActiveMutation]);
+  ], [deleteUserMutation, toggleAdminMutation, toggleActiveMutation, onSeeVideos]);
 
   const table = useReactTable({
-    data: users || [],
+    data: filteredUsers,
     columns,
     state: {
       sorting,
@@ -199,6 +246,36 @@ function Users() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
         <p className="text-gray-600">Manage and view all system users</p>
+      </div>
+
+      {/* Search and Filter Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        <Input
+          placeholder="Search by name or email..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="max-w-xs"
+        />
+        <Select value={roleFilter} onValueChange={v => setRoleFilter(v as 'all' | 'admin' | 'user')}>
+          <SelectTrigger className="max-w-xs">
+            <span>Role: {roleFilter === 'all' ? 'All' : roleFilter.charAt(0).toUpperCase() + roleFilter.slice(1)}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="user">User</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={v => setStatusFilter(v as 'all' | 'active' | 'inactive')}>
+          <SelectTrigger className="max-w-xs">
+            <span>Status: {statusFilter === 'all' ? 'All' : statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1)}</span>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="bg-white shadow-sm rounded-lg border border-gray-200">

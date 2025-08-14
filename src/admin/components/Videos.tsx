@@ -1,6 +1,7 @@
 import { adminApi } from "@/services/adminApi";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { User } from '@/types';
 
 // Video type definition
 type Video = {
@@ -16,7 +17,11 @@ type Video = {
   };
 };
 
-function Videos() {
+interface VideosProps {
+  selectedUser?: User | null;
+}
+
+function Videos({ selectedUser }: VideosProps) {
   const { data: videos, isLoading, error } = useQuery<Video[]>({
     queryKey: ['admin-videos'],
     queryFn: () => adminApi.getAllVideos(),
@@ -26,18 +31,30 @@ function Videos() {
   const users = useMemo(() => {
     if (!videos) return [];
     const emails = videos.map((v) => v.userId?.email).filter(Boolean);
-    return Array.from(new Set(emails));
-  }, [videos]);
+    const uniqueEmails = Array.from(new Set(emails));
+    // Ensure selectedUser email is present
+    if (selectedUser?.email && !uniqueEmails.includes(selectedUser.email)) {
+      uniqueEmails.push(selectedUser.email);
+    }
+    return uniqueEmails;
+  }, [videos, selectedUser]);
 
   // Filter state
-  const [selectedUser, setSelectedUser] = useState<string>("");
+  const [userFilter, setUserFilter] = useState<string>("");
+
+  // Automatically select user if selectedUser changes
+  useEffect(() => {
+    if (selectedUser?.email) {
+      setUserFilter(selectedUser.email);
+    }
+  }, [selectedUser]);
 
   // Filter videos by selected user
   const filteredVideos = useMemo(() => {
     if (!videos) return [];
-    if (!selectedUser) return videos;
-    return videos.filter((v) => v.userId?.email === selectedUser);
-  }, [videos, selectedUser]);
+    if (!userFilter) return videos;
+    return videos.filter((v) => v.userId?.email === userFilter);
+  }, [videos, userFilter]);
 
   if (isLoading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center py-8 text-red-500">Error loading videos</div>;
@@ -51,8 +68,8 @@ function Videos() {
           <label className="text-sm font-medium mr-2">Sort by user:</label>
           <select
             className="border rounded px-2 py-1"
-            value={selectedUser}
-            onChange={e => setSelectedUser(e.target.value)}
+            value={userFilter}
+            onChange={e => setUserFilter(e.target.value)}
           >
             <option value="">All Users</option>
             {users.map(email => (
