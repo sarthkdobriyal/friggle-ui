@@ -173,7 +173,18 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
   // Dashboard mode for authenticated users
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-8 px-4 relative">
+      {/* Transparent overlay to block navigation/interactions during video generation */}
+      {generateVideoMutation.isPending && (
+        <div
+          className="fixed inset-0 z-50 bg-transparent"
+          style={{ pointerEvents: "auto" }}
+          tabIndex={-1}
+          aria-modal="true"
+          role="dialog"
+        />
+      )}
+
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -311,7 +322,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
               <button
                 onClick={handleGenerate}
-                disabled={!prompt.trim() || generateVideoMutation.isPending}
+                disabled={!prompt.trim() || generateVideoMutation.isPending || enhancePrompt.isPending}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {generateVideoMutation.isPending ? (
@@ -413,3 +424,4 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 };
 
 export default MakeVideos;
+ 
