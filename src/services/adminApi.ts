@@ -13,5 +13,17 @@ export const adminApi = {
   getAllVideos: async () => {
     const response = await authClient.get('/admin/allVideos');
     return response.data;
+  },
+  deleteUser: async (userId: string) => {
+    const response = await authClient.delete('/admin/user', { data: { userId } });
+    return response.data;
+  },
+  toggleUserActive: async (userId: string) => {
+    const response = await authClient.patch('/admin/user/toggleActive', { userId });
+    return response.data;
+  },
+  toggleUserAdmin: async (userId: string) => {
+    const response = await authClient.patch('/admin/user/toggleAdmin', { userId });
+    return response.data;
   }
 };

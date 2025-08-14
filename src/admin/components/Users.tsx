@@ -1,5 +1,5 @@
 import { adminApi } from '@/services/adminApi';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import  { useMemo, useState } from 'react';
 import {
   useReactTable,
@@ -8,10 +8,12 @@ import {
   getPaginationRowModel,
   flexRender,
   createColumnHelper,
-  
 } from '@tanstack/react-table';
+import { type SortingState } from '@tanstack/react-table';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
-import {type SortingState } from '@tanstack/react-table';
 
 interface User {
   _id: string;
@@ -30,10 +32,47 @@ const columnHelper = createColumnHelper<User>();
 
 function Users() {
   const [sorting, setSorting] = useState<SortingState>([]);
-  
-  const { data: users, isLoading, error } = useQuery({
+  const queryClient = useQueryClient();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+
+  const { data: users, isPending, error } = useQuery({
     queryKey: ['admin-users'],
     queryFn: () => adminApi.getAllUsers(),
+  });
+
+  // Mutations
+  const deleteUserMutation = useMutation({
+    mutationFn: (userId: string) => adminApi.deleteUser(userId),
+    onSuccess: () => {
+      toast.success('User deleted');
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: () => {
+      toast.error('Failed to delete user');
+    }
+  });
+
+  const toggleAdminMutation = useMutation({
+    mutationFn: (userId: string) => adminApi.toggleUserAdmin(userId),
+    onSuccess: () => {
+      toast.success('User admin status updated');
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: () => {
+      toast.error('Failed to update admin status');
+    }
+  });
+
+  const toggleActiveMutation = useMutation({
+    mutationFn: (userId: string) => adminApi.toggleUserActive(userId),
+    onSuccess: () => {
+      toast.success('User active status updated');
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+    onError: () => {
+      toast.error('Failed to update active status');
+    }
   });
 
   const columns = useMemo(() => [
@@ -45,10 +84,10 @@ function Users() {
       header: 'Last Name',
       cell: info => info.getValue(),
     }),
-    columnHelper.accessor('username', {
-      header: 'Username',
-      cell: info => info.getValue(),
-    }),
+    // columnHelper.accessor('username', {
+    //   header: 'Username',
+    //   cell: info => info.getValue(),
+    // }),
     columnHelper.accessor('email', {
       header: 'Email',
       cell: info => info.getValue(),
@@ -81,7 +120,46 @@ function Users() {
       header: 'Created At',
       cell: info => new Date(info.getValue()).toLocaleDateString(),
     }),
-  ], []);
+    // Actions column
+    columnHelper.display({
+      id: 'actions',
+      header: 'Actions',
+      cell: info => {
+        const user = info.row.original;
+        return (
+          <div className="flex gap-2">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                setUserToDelete(user);
+                setConfirmOpen(true);
+              }}
+              disabled={deleteUserMutation.isPending}
+            >
+              Delete
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => toggleAdminMutation.mutate(user._id)}
+              disabled={toggleAdminMutation.isPending}
+            >
+              {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+            </Button>
+            <Button
+              variant={user.isActive ? "default" : "outline"}
+              size="sm"
+              onClick={() => toggleActiveMutation.mutate(user._id)}
+              disabled={toggleActiveMutation.isPending}
+            >
+              {user.isActive ? 'Deactivate' : 'Activate'}
+            </Button>
+          </div>
+        );
+      }
+    }),
+  ], [deleteUserMutation, toggleAdminMutation, toggleActiveMutation]);
 
   const table = useReactTable({
     data: users || [],
@@ -100,7 +178,7 @@ function Users() {
     },
   });
 
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg">Loading users...</div>
@@ -235,6 +313,36 @@ function Users() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal using shadcn/ui */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete user <span className="font-semibold">{userToDelete?.email}</span>? This will also remove all their videos.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (userToDelete) {
+                  deleteUserMutation.mutate(userToDelete._id);
+                }
+                setConfirmOpen(false);
+                setUserToDelete(null);
+              }}
+              disabled={deleteUserMutation.isPending}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
