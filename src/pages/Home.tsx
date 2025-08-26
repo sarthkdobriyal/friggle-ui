@@ -169,6 +169,9 @@ const Home: React.FC = () => {
                       src={video.video_url} 
                       className="w-full h-full object-cover"
                       controls
+                      controlsList="nodownload noplaybackrate"
+                      disablePictureInPicture
+                      muted
                       preload="metadata"
                     />
                   </div>
