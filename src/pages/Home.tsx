@@ -173,6 +173,9 @@ const Home: React.FC = () => {
                       disablePictureInPicture
                       muted
                       preload="metadata"
+                      // poster={`${video.video_url}#t=0.1`}
+                      playsInline
+                      webkit-playsinline="true"
                     />
                   </div>
                  
