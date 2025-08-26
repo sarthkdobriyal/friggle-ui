@@ -172,16 +172,7 @@ const Home: React.FC = () => {
                       preload="metadata"
                     />
                   </div>
-                  <div className="p-6">
-                    <div className="mb-3">
-                      <span className="inline-block bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
-                        AI Generated
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">
-                      {video.prompt}
-                    </h3>
-                  </div>
+                 
                 </div>
               ))}
             </div>
