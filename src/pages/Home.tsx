@@ -169,13 +169,14 @@ const Home: React.FC = () => {
                       src={video.video_url} 
                       className="w-full h-full object-cover"
                       controls
-                      controlsList="nodownload noplaybackrate"
-                      disablePictureInPicture
+                      autoPlay={true}
+                      // controlsList="nodownload noplaybackrate"
+                      // disablePictureInPicture
                       muted
-                      preload="metadata"
+                      // preload="metadata"
                       // poster={`${video.video_url}#t=0.1`}
-                      playsInline
-                      webkit-playsinline="true"
+                      // playsInline
+                      // webkit-playsinline="true"
                     />
                   </div>
                  
