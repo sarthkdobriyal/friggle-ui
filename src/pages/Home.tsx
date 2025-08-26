@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router';
 import hero from '../assets/videos/hero.mp4'
 import HeaderForHomepage from '../components/layout/HeaderForHomepage';
+import { useQuery } from '@tanstack/react-query';
+import { videoApi } from '@/services/videoApi';
+import type { Video } from '@/types';
 
 const Home: React.FC = () => {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -10,6 +13,19 @@ const Home: React.FC = () => {
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
+
+   const {
+      data: exampleVideos,
+      isLoading: isLoadingExample,
+      error: exampleError,
+    } = useQuery({
+      queryKey: ["exampleVideos"],
+      queryFn: () => videoApi.getExampleVideos(),
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+    });
+
+    console.log(exampleVideos);
 
   const faqs = [
     {
@@ -123,6 +139,65 @@ const Home: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Example Videos Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-purple-900/30 to-purple-900/40">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">See AI in Action</h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+              Discover what our AI can create from simple text prompts
+            </p>
+          </div>
+          
+          {isLoadingExample ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400"></div>
+            </div>
+          ) : exampleError ? (
+            <div className="text-center text-gray-400 py-20">
+              <p>Unable to load example videos</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {exampleVideos?.slice(0, 3).map((video: Video) => (
+                <div key={video._id} className="bg-white/5 backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 hover:border-purple-400/30 transition-all">
+                  <div className="aspect-video relative bg-black/20">
+                    <video 
+                      src={video.video_url} 
+                      className="w-full h-full object-cover"
+                      controls
+                      preload="metadata"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <div className="mb-3">
+                      <span className="inline-block bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-purple-300 px-3 py-1 rounded-full text-sm font-medium">
+                        AI Generated
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      {video.prompt}
+                    </h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {exampleVideos && exampleVideos.length > 0 && (
+            <div className="text-center mt-12">
+              <Link
+                to="/register"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600/30 hover:to-blue-600/30 transition-all border border-purple-400/30"
+              >
+                <span>Create Your Own Video</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 type Video = {
   id: string;
+  _id?: string;
   userId: string;
   video_url: string;
   thumbnailUrl?: string;

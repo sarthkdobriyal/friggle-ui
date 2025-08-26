@@ -1,4 +1,4 @@
-import { authClient } from "@/utils/api-client";
+import { authClient, unauthClient } from "@/utils/api-client";
 
 // Video generation API
 export const videoApi = {
@@ -16,6 +16,10 @@ export const videoApi = {
   },
   enhancePrompt: async (userInput: string) => {
     const response = await authClient.post('/video/enhancePrompt', { userInput });
+    return response.data;
+  },
+  getExampleVideos: async () => {
+    const response = await unauthClient.get('/video/examples');
     return response.data;
   }
 };
