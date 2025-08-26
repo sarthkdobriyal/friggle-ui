@@ -22,6 +22,11 @@ interface User {
   __v: number;
 }
 
+type ErrorType = {
+  message: string;
+  code?: number;
+}
 
 
-export type { Video, User };
+
+export type { Video, User, ErrorType };

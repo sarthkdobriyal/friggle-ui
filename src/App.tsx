@@ -22,6 +22,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import AdminDashboard from './admin/AdminDashboard';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 
 
@@ -49,6 +51,16 @@ function App() {
           <Route path="/register" element={
             <Layout>
               <Register />
+            </Layout>
+          } />
+          <Route path="/forgot-password" element={
+            <Layout>
+              <ForgotPassword />
+            </Layout>
+          } />
+          <Route path="/reset-password/:token" element={
+            <Layout>
+              <ResetPassword />
             </Layout>
           } />
           
