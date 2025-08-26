@@ -1,12 +1,42 @@
-import { ArrowRight, Globe, Play, Sparkles, Zap } from 'lucide-react';
-import React from 'react';
+import { ArrowRight, ChevronDown, ChevronUp, Globe, Play, Sparkles, Zap } from 'lucide-react';
+import React, { useState } from 'react';
 import { Link } from 'react-router';
 import hero from '../assets/videos/hero.mp4'
 import HeaderForHomepage from '../components/layout/HeaderForHomepage';
 
 const Home: React.FC = () => {
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
+  const toggleFAQ = (index: number) => {
+    setOpenFAQ(openFAQ === index ? null : index);
+  };
 
+  const faqs = [
+    {
+      question: "How does AI video generation work?",
+      answer: "Our AI analyzes your text prompt and generates videos using advanced machine learning models. Simply describe what you want to see, and our AI creates realistic video content based on your description."
+    },
+    {
+      question: "What video formats and resolutions are supported?",
+      answer: "We support multiple formats including MP4, MOV, and WebM. Videos can be generated in various resolutions from 720p to 4K, depending on your subscription plan."
+    },
+    {
+      question: "How long does it take to generate a video?",
+      answer: "Video generation typically takes 2-5 minutes for short clips (up to 30 seconds) and 10-15 minutes for longer videos, depending on complexity and current server load."
+    },
+    {
+      question: "Is there a free trial available?",
+      answer: "Yes! New users get 3 free video generations to try our service. No credit card required for the trial period."
+    },
+    {
+      question: "Can I use the generated videos commercially?",
+      answer: "Yes, all videos generated with paid plans come with commercial usage rights. Free trial videos are for personal use only."
+    },
+    {
+      question: "What languages are supported for prompts?",
+      answer: "We support prompts in over 20 languages including English, Spanish, French, German, Chinese, Japanese, and more. The AI can also generate videos with text in different languages."
+    }
+  ];
 
   return (
      <div className="min-h-screen ">
@@ -39,13 +69,6 @@ const Home: React.FC = () => {
             >
               <span>Start Creating Free</span>
               <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              to="/make-videos"
-              className="border border-purple-400/50 text-purple-400 px-8 py-4 rounded-lg font-semibold hover:bg-purple-400/10 transition-all flex items-center space-x-2"
-            >
-              <Play className="h-5 w-5" />
-              <span>Watch Demo</span>
             </Link>
           </div>
         </div>
@@ -99,6 +122,41 @@ const Home: React.FC = () => {
                 Create content in multiple languages and styles. Perfect for global audiences and diverse content needs.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 px-4 bg-gradient-to-b from-purple-900/30 to-blue-900/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">Frequently Asked Questions</h2>
+            <p className="text-gray-300 text-lg">
+              Get answers to common questions about AI video generation
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div key={index} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full px-8 py-6 text-left flex justify-between items-center hover:bg-white/5 transition-all"
+                >
+                  <h3 className="text-lg font-semibold text-white pr-4">{faq.question}</h3>
+                  {openFAQ === index ? (
+                    <ChevronUp className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-purple-400 flex-shrink-0" />
+                  )}
+                </button>
+                {openFAQ === index && (
+                  <div className="px-8 pb-6">
+                    <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
