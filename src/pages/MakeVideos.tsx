@@ -22,6 +22,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
   const { isAuthenticated } = useAuth();
   const [prompt, setPrompt] = useState("");
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
 
   const generateVideoMutation = useMutation({
     mutationFn: (prompt: string) => videoApi.generateVideo(prompt),
@@ -64,7 +65,17 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
+    
+    if (!isAuthenticated) {
+      setShowSignUpPrompt(true);
+      return;
+    }
+    
     generateVideoMutation.mutate(prompt);
+  };
+
+  const handleSignUpPromptClose = () => {
+    setShowSignUpPrompt(false);
   };
 
   const handleDownload = () => {
@@ -118,8 +129,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               AI Video Generation
             </h1>
             <p className="text-gray-300 text-lg">
-              Experience the power of AI-driven video creation. Sign up to start
-              generating your own videos.
+              Experience the power of AI-driven video creation. Try it out below!
             </p>
           </div>
 
@@ -130,19 +140,51 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               </label>
               <textarea
                 rows={4}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
                 className="w-full p-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 placeholder="A cat playing with a ball of yarn in slow motion..."
-                disabled
               />
             </div>
 
             <button
-              disabled
-              className="w-full bg-gradient-to-r from-purple-600/50 to-blue-600/50 text-white py-3 rounded-lg font-semibold cursor-not-allowed opacity-50"
+              onClick={handleGenerate}
+              disabled={!prompt.trim()}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
             >
-              Sign up to generate videos
+              <Play className="h-5 w-5" />
+              <span>Generate Video</span>
             </button>
           </div>
+
+          {/* Sign-up prompt modal */}
+          {showSignUpPrompt && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-md w-full">
+                <h3 className="text-xl font-bold text-white mb-4">Sign Up Required</h3>
+                <p className="text-gray-300 mb-6">
+                  To generate AI videos, you need to create an account. Sign up now to start creating amazing videos with AI!
+                </p>
+                <div className="flex space-x-4">
+                  <button
+                    onClick={handleSignUpPromptClose}
+                    className="flex-1 bg-white/10 text-white py-2 rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Navigate to sign up page - you may need to implement this based on your routing
+                      window.location.href = '/register'; // or use your router
+                    }}
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Sample videos showcase */}
           <div className="grid md:grid-cols-2 gap-6">
@@ -424,4 +466,4 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 };
 
 export default MakeVideos;
- 
+
