@@ -324,14 +324,18 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                 
 
                 <Select onValueChange={(value) => setChosenModel(value)} defaultValue="gemini_veo_3">
-                  <SelectTrigger className="text-white py-2 rounded-lg font-semibold w-[20%]">
+                  <SelectTrigger className="text-white py-2 rounded-lg font-semibold ">
                     <SelectValue  placeholder="Select Model" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="gemini_veo_3">Gemini Veo 3</SelectItem>
                     <SelectItem value="bytez_1.7b">Bytez Ai</SelectItem>
-                    <SelectItem value="eden_ai">Eden Ai</SelectItem>
-                    <SelectItem value="runway_ml">RunwayML</SelectItem>
+                    {/* <SelectItem value="bytedance/seedance-1-pro">bytedance/seedance-1-pro</SelectItem> */}
+                    {/* <SelectItem value="eden_ai">Eden Ai</SelectItem>
+                    <SelectItem value="runway_ml">RunwayML</SelectItem> */}
+                    <SelectItem value="black-forest-labs/flux-kontext-pro">black-forest-labs/flux-kontext-pro</SelectItem>
+                    <SelectItem value="leonardoai/motion-2.0">leonardoai/motion-2.0</SelectItem>
+                    <SelectItem value="tencent/hunyuan-video">tencent/hunyuan-video</SelectItem>
                   </SelectContent>
                 </Select>
 
