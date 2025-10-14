@@ -330,7 +330,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   <SelectContent>
                     <SelectItem value="gemini_veo_3">Gemini Veo 3</SelectItem>
                     <SelectItem value="bytez_1.7b">Bytez Ai</SelectItem>
-                    {/* <SelectItem value="bytedance/seedance-1-pro">bytedance/seedance-1-pro</SelectItem> */}
+                    <SelectItem value="bytedance/seedance-1-pro">bytedance/seedance-1-pro</SelectItem>
                     {/* <SelectItem value="eden_ai">Eden Ai</SelectItem>
                     <SelectItem value="runway_ml">RunwayML</SelectItem> */}
                     <SelectItem value="black-forest-labs/flux-kontext-pro">black-forest-labs/flux-kontext-pro</SelectItem>
