@@ -319,7 +319,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   placeholder="Describe your video in detail... (e.g., 'A majestic eagle soaring through clouds at sunset, cinematic style')"
                 />
 
-                <div className="flex mt-4 items-center justify-end gap-x-4">
+                <div className="flex mt-4 items-center flex-col md:flex-row gap-y-3 md:justify-end gap-x-4">
 
                 
 
