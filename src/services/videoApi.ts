@@ -2,8 +2,8 @@ import { authClient, unauthClient } from "@/utils/api-client";
 
 // Video generation API
 export const videoApi = {
-  generateVideo: async (prompt: string) => {
-    const response = await authClient.post('/video/generate', { prompt });
+  generateVideo: async (prompt: string, chosenModel: string) => {
+    const response = await authClient.post('/video/generate', { prompt, model: chosenModel });
     return response.data;
   },
   getRecentVideos: async () => {

@@ -13,6 +13,13 @@ import { Play, Download, Share2, Sparkles } from "lucide-react";
 import { videoApi } from "@/services/videoApi";
 import { toast } from "sonner";
 import type { Video } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface MakeVideosPageProps {
   isDashboard?: boolean;
@@ -24,8 +31,10 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
 
+  const [chosenModel, setChosenModel] = useState("gemini_veo_3");
+
   const generateVideoMutation = useMutation({
-    mutationFn: (prompt: string) => videoApi.generateVideo(prompt),
+    mutationFn: (prompt: string) => videoApi.generateVideo(prompt, chosenModel),
     onSuccess: (data) => {
       toast.success("Video generated successfully!");
       console.log("Generated video data:", data);
@@ -65,12 +74,12 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    
+
     if (!isAuthenticated) {
       setShowSignUpPrompt(true);
       return;
     }
-    
+
     generateVideoMutation.mutate(prompt);
   };
 
@@ -117,8 +126,6 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
     }
   };
 
-  console.log("Recent videos:", recentVideos);
-
   if (!isDashboard && !isAuthenticated) {
     // Preview mode for non-authenticated users
     return (
@@ -129,7 +136,8 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
               AI Video Generation
             </h1>
             <p className="text-gray-300 text-lg">
-              Experience the power of AI-driven video creation. Try it out below!
+              Experience the power of AI-driven video creation. Try it out
+              below!
             </p>
           </div>
 
@@ -161,9 +169,12 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
           {showSignUpPrompt && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 max-w-md w-full">
-                <h3 className="text-xl font-bold text-white mb-4">Sign Up Required</h3>
+                <h3 className="text-xl font-bold text-white mb-4">
+                  Sign Up Required
+                </h3>
                 <p className="text-gray-300 mb-6">
-                  To generate AI videos, you need to create an account. Sign up now to start creating amazing videos with AI!
+                  To generate AI videos, you need to create an account. Sign up
+                  now to start creating amazing videos with AI!
                 </p>
                 <div className="flex space-x-4">
                   <button
@@ -175,7 +186,7 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   <button
                     onClick={() => {
                       // Navigate to sign up page - you may need to implement this based on your routing
-                      window.location.href = '/register'; // or use your router
+                      window.location.href = "/register"; // or use your router
                     }}
                     className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
                   >
@@ -307,25 +318,41 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
                   className="disabled:cursor-not-allowed w-full p-4 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                   placeholder="Describe your video in detail... (e.g., 'A majestic eagle soaring through clouds at sunset, cinematic style')"
                 />
+
+                <div className="flex mt-4 items-center justify-end gap-x-4">
+
+                
+
+                <Select onValueChange={(value) => setChosenModel(value)} defaultValue="gemini_veo_3">
+                  <SelectTrigger className="text-white py-2 rounded-lg font-semibold w-[20%]">
+                    <SelectValue  placeholder="Select Model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gemini_veo_3">Gemini Veo 3</SelectItem>
+                    <SelectItem value="bytez_1.7b">Bytez Ai</SelectItem>
+                    <SelectItem value="eden_ai">Eden Ai</SelectItem>
+                    <SelectItem value="runway_ml">RunwayML</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 <button
                   onClick={() => enhancePrompt.mutate(prompt)}
                   disabled={!prompt.trim() || enhancePrompt.isPending}
-                  className="justify-self-end mt-2 px-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  className="justify-self-end  px-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  {
-                    enhancePrompt.isPending ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Enhancing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-5 w-5" />
-                        <span>Enhance Prompt</span>
-                      </>
-                    )
-                  }
+                  {enhancePrompt.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Enhancing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5" />
+                      <span>Enhance Prompt</span>
+                    </>
+                  )}
                 </button>
+                </div>
               </div>
 
               {/* <div className="flex items-center justify-between mb-6">
@@ -364,7 +391,11 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 
               <button
                 onClick={handleGenerate}
-                disabled={!prompt.trim() || generateVideoMutation.isPending || enhancePrompt.isPending}
+                disabled={
+                  !prompt.trim() ||
+                  generateVideoMutation.isPending ||
+                  enhancePrompt.isPending
+                }
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {generateVideoMutation.isPending ? (
@@ -466,4 +497,3 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
 };
 
 export default MakeVideos;
-
