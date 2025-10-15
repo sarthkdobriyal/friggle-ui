@@ -20,6 +20,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
+  refetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -152,6 +153,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const refetchUser = async () => {
+    try {
+      const response = await authClient.get('/auth/me');
+      if (response.data.success) {
+        const userData = response.data.user;
+        setUser({
+          id: userData._id,
+          name: `${userData.firstName} ${userData.lastName}`,
+          email: userData.email,
+          credits: userData.credits || 0,
+          role: userData.role,
+        });
+      }
+    }catch (error) {
+      console.error('Failed to refetch user data:', error);
+    }
+  }
+
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
@@ -159,6 +178,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     logout,
+    refetchUser,
     register
   };
 

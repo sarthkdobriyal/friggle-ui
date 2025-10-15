@@ -20,7 +20,7 @@ const Credits: React.FC = () => {
               <p className="text-gray-300">Available credits for video generation</p>
             </div>
             <div className="text-right">
-              <p className="text-4xl font-bold text-green-400">{user?.credits || 0}</p>
+              <p className="text-4xl font-bold text-green-400">{user?.credits}</p>
               <p className="text-sm text-gray-300">credits</p>
             </div>
           </div>

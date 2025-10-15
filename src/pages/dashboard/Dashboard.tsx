@@ -3,12 +3,15 @@ import { useQuery } from '@tanstack/react-query';
 import { Play } from 'lucide-react';
 import { videoApi } from '@/services/videoApi';
 import type { Video } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { data: recentVideos, isLoading: isLoadingRecent, error: recentError } = useQuery({
     queryKey: ['recentVideos'],
     queryFn: () => videoApi.getRecentVideos(),
   });
+
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen">
@@ -27,7 +30,7 @@ const Dashboard: React.FC = () => {
           
           <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 p-6">
             <h3 className="text-lg font-semibold text-white mb-2">Credits Remaining</h3>
-            <p className="text-3xl font-bold text-green-600">87</p>
+            <p className="text-3xl font-bold text-green-600">{user?.credits}</p>
           </div>
           
           <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 p-6">

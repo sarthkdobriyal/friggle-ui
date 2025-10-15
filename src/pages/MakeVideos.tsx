@@ -26,7 +26,7 @@ interface MakeVideosPageProps {
 }
 
 const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, refetchUser } = useAuth();
   const [prompt, setPrompt] = useState("");
   const [generatedVideo, setGeneratedVideo] = useState<string | null>(null);
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
@@ -39,6 +39,8 @@ const MakeVideos: React.FC<MakeVideosPageProps> = ({ isDashboard = false }) => {
       toast.success("Video generated successfully!");
       console.log("Generated video data:", data);
       setGeneratedVideo(data.videoUrl || "generated-video-url");
+      toast.info(`Credits left: ${data.creditsLeft}`);
+      refetchUser()
     },
     onError: (error: any) => {
       console.error("Video generation failed:", error);

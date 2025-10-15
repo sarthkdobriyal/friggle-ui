@@ -15,10 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 import type { User } from '@/types';
-
-
-
 
 const columnHelper = createColumnHelper<User>();
 
@@ -31,6 +30,9 @@ function Users({ onSeeVideos }: UsersProps) {
   const queryClient = useQueryClient();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [addCreditsOpen, setAddCreditsOpen] = useState(false);
+  const [userToAddCredits, setUserToAddCredits] = useState<User | null>(null);
+  const [creditsAmount, setCreditsAmount] = useState<number>(0);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'all' | 'admin' | 'user'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -74,6 +76,21 @@ function Users({ onSeeVideos }: UsersProps) {
     }
   });
 
+  const addCreditsMutation = useMutation({
+    mutationFn: ({ userId, credits }: { userId: string; credits: number }) => 
+      adminApi.addCreditsToUser(userId, credits),
+    onSuccess: () => {
+      toast.success('Credits added successfully');
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setAddCreditsOpen(false);
+      setUserToAddCredits(null);
+      setCreditsAmount(0);
+    },
+    onError: () => {
+      toast.error('Failed to add credits');
+    }
+  });
+
   // Filter users based on search and filters
   const filteredUsers = useMemo(() => {
     if (!users) return [];
@@ -102,14 +119,14 @@ function Users({ onSeeVideos }: UsersProps) {
   }, [users, search, roleFilter, statusFilter]);
 
   const columns = useMemo(() => [
-    columnHelper.accessor('firstName', {
-      header: 'First Name',
-      cell: info => info.getValue(),
-    }),
-    columnHelper.accessor('lastName', {
-      header: 'Last Name',
-      cell: info => info.getValue(),
-    }),
+    columnHelper.display({
+  id: 'fullName',
+  header: 'Full Name',
+  cell: info => {
+    const user = info.row.original;
+    return `${user.firstName} ${user.lastName}`;
+  },
+}),
     // columnHelper.accessor('username', {
     //   header: 'Username',
     //   cell: info => info.getValue(),
@@ -117,6 +134,14 @@ function Users({ onSeeVideos }: UsersProps) {
     columnHelper.accessor('email', {
       header: 'Email',
       cell: info => info.getValue(),
+    }),
+    columnHelper.accessor('credits', {
+      header: 'Credits',
+      cell: info => (
+        <span className="px-2 py-1 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+          {info.getValue() || 0}
+        </span>
+      ),
     }),
     columnHelper.accessor('role', {
       header: 'Role',
@@ -173,36 +198,45 @@ function Users({ onSeeVideos }: UsersProps) {
       cell: info => {
         const user = info.row.original;
         return (
-          <div className="flex gap-2">
-           
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => toggleAdminMutation.mutate(user._id)}
-              disabled={toggleAdminMutation.isPending}
-            >
-              {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
-            </Button>
-            <Button
-              variant={user.isActive ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleActiveMutation.mutate(user._id)}
-              disabled={toggleActiveMutation.isPending}
-            >
-              {user.isActive ? 'Deactivate' : 'Activate'}
-            </Button>
-             <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                setUserToDelete(user);
-                setConfirmOpen(true);
-              }}
-              disabled={deleteUserMutation.isPending}
-            >
-              Delete
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => toggleAdminMutation.mutate(user._id)}
+                disabled={toggleAdminMutation.isPending}
+              >
+                {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => toggleActiveMutation.mutate(user._id)}
+                disabled={toggleActiveMutation.isPending}
+              >
+                {user.isActive ? 'Deactivate' : 'Activate'}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setUserToAddCredits(user);
+                  setAddCreditsOpen(true);
+                }}
+              >
+                Add Credits
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setUserToDelete(user);
+                  setConfirmOpen(true);
+                }}
+                disabled={deleteUserMutation.isPending}
+                className="text-destructive focus:text-destructive"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         );
       }
     }),
@@ -416,6 +450,53 @@ function Users({ onSeeVideos }: UsersProps) {
               disabled={deleteUserMutation.isPending}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Credits Modal */}
+      <Dialog open={addCreditsOpen} onOpenChange={setAddCreditsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Credits</DialogTitle>
+            <DialogDescription>
+              Add credits to user <span className="font-semibold">{userToAddCredits?.email}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              type="number"
+              placeholder="Enter number of credits"
+              value={creditsAmount}
+              onChange={(e) => setCreditsAmount(Number(e.target.value))}
+              min="0"
+              step="1"
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setAddCreditsOpen(false);
+                setUserToAddCredits(null);
+                setCreditsAmount(0);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (userToAddCredits && creditsAmount > 0) {
+                  addCreditsMutation.mutate({
+                    userId: userToAddCredits._id,
+                    credits: creditsAmount
+                  });
+                }
+              }}
+              disabled={addCreditsMutation.isPending || creditsAmount <= 0}
+            >
+              {addCreditsMutation.isPending ? 'Adding...' : 'Add Credits'}
             </Button>
           </DialogFooter>
         </DialogContent>

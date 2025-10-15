@@ -15,6 +15,7 @@ interface User {
   firstName: string;
   lastName: string;
   username: string;
+  credits: number;
   role: string;
   isActive: boolean;
   createdAt: string;

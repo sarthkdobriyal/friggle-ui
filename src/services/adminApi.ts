@@ -25,5 +25,9 @@ export const adminApi = {
   toggleUserAdmin: async (userId: string) => {
     const response = await authClient.patch('/admin/user/toggleAdmin', { userId });
     return response.data;
+  },
+  addCreditsToUser: async (userId: string, credits: number) => {
+    const response = await authClient.post('/admin/user/addCredits', { userId, credits });
+    return response.data;
   }
 };
