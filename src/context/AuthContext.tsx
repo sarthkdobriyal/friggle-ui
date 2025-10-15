@@ -10,6 +10,8 @@ interface User {
   credits: number;
   role?: string; // Optional role field for future use
   isActive?: boolean; // Optional field to check if user is active
+  totalVideosGenerated?: number;
+  totalVideosGeneratedThisMonth?: number;
 }
 
 interface AuthContextType {
@@ -55,6 +57,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               email: response.data.user.email,
               credits: response.data.user.credits || 0,
               role: response.data.user.role, // Default to 'user' role
+              totalVideosGenerated: response.data.user.totalVideosGenerated || 0,
+              totalVideosGeneratedThisMonth: response.data.user.totalVideosGeneratedThisMonth || 0,
             });
           }
         })
@@ -86,6 +90,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: userData.email,
           credits: userData.credits || 0,
           role: userData.role, // Default to 'user' role
+          totalVideosGenerated: userData.totalVideosGenerated || 0,
+          totalVideosGeneratedThisMonth: userData.totalVideosGeneratedThisMonth || 0,
         };
         
         setUser(newUser);
@@ -124,7 +130,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           name: `${userData.firstName} ${userData.lastName}`,
           email: userData.email,
           credits: userData.credits || 50,
-          role: userData.role  // Default to 'user' role
+          role: userData.role,  // Default to 'user' role
+          totalVideosGenerated: userData.totalVideosGenerated || 0,
+          totalVideosGeneratedThisMonth: userData.totalVideosGeneratedThisMonth || 0,
         };
         
         setUser(newUser);
@@ -164,6 +172,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           email: userData.email,
           credits: userData.credits || 0,
           role: userData.role,
+          totalVideosGenerated: userData.totalVideosGenerated || 0,
+          totalVideosGeneratedThisMonth: userData.totalVideosGeneratedThisMonth || 0,
         });
       }
     }catch (error) {

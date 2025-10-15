@@ -171,6 +171,11 @@ function Users({ onSeeVideos }: UsersProps) {
       header: 'Created At',
       cell: info => new Date(info.getValue()).toLocaleDateString(),
     }),
+    columnHelper.accessor('totalVideosGenerated', {
+      header: 'Videos',
+      cell: info => info.getValue(),
+
+    }),
     // Actions column
     columnHelper.display({
       id: 'videos',

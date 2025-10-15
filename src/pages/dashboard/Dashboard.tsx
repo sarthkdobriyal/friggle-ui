@@ -25,7 +25,7 @@ const Dashboard: React.FC = () => {
           {/* Quick Stats */}
           <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 p-6">
             <h3 className="text-lg font-semibold text-white mb-2">Videos Created</h3>
-            <p className="text-3xl font-bold text-blue-600">{recentVideos?.length || 0}</p>
+            <p className="text-3xl font-bold text-blue-600">{user?.totalVideosGenerated}</p>
           </div>
           
           <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 p-6">
@@ -35,7 +35,7 @@ const Dashboard: React.FC = () => {
           
           <div className="bg-white/10 backdrop-blur-lg rounded-lg border border-white/20 p-6">
             <h3 className="text-lg font-semibold text-white mb-2">This Month</h3>
-            <p className="text-3xl font-bold text-purple-600">5</p>
+            <p className="text-3xl font-bold text-purple-600">{user?.totalVideosGeneratedThisMonth}</p>
           </div>
         </div>
 

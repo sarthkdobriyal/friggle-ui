@@ -20,7 +20,8 @@ interface User {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  __v: number;
+  totalVideosGenerated: number;
+  totalVideosGeneratedThisMonth: number;
 }
 
 type ErrorType = {
