@@ -58,7 +58,18 @@ const Home: React.FC = () => {
      <div className="min-h-screen ">
       {/* Hero Section */}
       <section className="relative overflow-hidden pb-20  h-full">
-        <video src={hero} className="absolute inset-0 w-full h-full object-cover opacity-70" autoPlay loop muted  />
+         <video 
+          src={hero} 
+          className="absolute inset-0 w-full h-full object-cover opacity-70" 
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          webkit-playsinline="true"
+          controlsList="nodownload noplaybackrate nofullscreen"
+          disablePictureInPicture
+          preload="auto"
+        />
        <HeaderForHomepage />
         
         <div className="relative z-10  md:max-w-7xl mt-18 sm:mt-32  md:mt-44 ml-4 md:ml-12  text-left">
@@ -173,6 +184,7 @@ const Home: React.FC = () => {
                       // controlsList="nodownload noplaybackrate"
                       // disablePictureInPicture
                       muted
+                      loop
                       // preload="metadata"
                       // poster={`${video.video_url}#t=0.1`}
                       // playsInline
